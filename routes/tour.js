@@ -1,14 +1,15 @@
+
+
 const express = require('express');
 const router = express.Router();
 
 
-
 const {
-    getAllTours, addTour, getTour, updateTour, deleteTour
+    getAllTours, addTour, getTour, updateTour, deleteTour, checkID
 } = require('../controllers/tours')
 
 
-
+router.param('id', checkID)
 
 router.route('/')
     .get(getAllTours)

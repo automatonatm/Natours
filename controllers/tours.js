@@ -2,12 +2,19 @@ const fs = require('fs');
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
-/*Route Handlers*/
-const addTour =  (req, res) => {
+
+// @desc Add a new tour
+// @route GET /api/v1/tours
+// @access Private
+
+exports.addTour =  (req, res) => {
     console.log(req.body)
 };
 
-const getAllTours  = (req, res) => {
+// @desc Get all tours
+// @route POST /api/v1/tours
+// @access Public
+exports.getAllTours  = (req, res) => {
     res.status(200).json({
         status: 'success',
         results: tours.length,
@@ -18,7 +25,10 @@ const getAllTours  = (req, res) => {
 
 };
 
-const getTour  =  (req, res) => {
+// @desc Add a  tour
+// @route POST /api/v1/tours/:id
+// @access Public
+exports.getTour  =  (req, res) => {
     const id = req.params.id * 1;
     const tour = tours.find(tour => tour.id === id);
 
@@ -31,8 +41,10 @@ const getTour  =  (req, res) => {
 
 };
 
-
-const updateTour = (req, res) => {
+// @desc Update a new tour
+// @route PUT /api/v1/tours/:id
+// @access Private
+exports.updateTour = (req, res) => {
     const id = req.params.id * 1;
     const tour = tours.find(tour => tour.id === id);
     if (!tour) {
@@ -51,9 +63,10 @@ const updateTour = (req, res) => {
 };
 
 
-
-
-const deleteTour = (req, res) => {
+// @desc delete a new tour
+// @route DELETE /api/v1/tours/:id
+// @access Private
+exports.deleteTour = (req, res) => {
 
     const id = req.params.id * 1;
     const tour = tours.find(tour => tour.id === id);
@@ -70,3 +83,5 @@ const deleteTour = (req, res) => {
         data: null
     })
 };
+
+

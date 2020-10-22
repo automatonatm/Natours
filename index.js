@@ -28,10 +28,6 @@ app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 
 
-
-const port = 8001;
-app.listen(port, () => {
-    console.log(`App running on port ${port}`)
-});
+module.exports = app;
 
 

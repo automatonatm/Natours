@@ -3,6 +3,10 @@ const router = express.Router();
 
 
 
+const {
+    getAllTours, addTour, getTour, updateTour, deleteTour
+} = require('../controllers/tours')
+
 
 
 

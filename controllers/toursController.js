@@ -11,7 +11,10 @@ const AppError = require('../utils/appError');
 
 exports.createTour =  catchAsync(async (req, res, next) => {
 
+
     const tour = await Tour.create(req.body);
+
+
 
     res.status(201).json({
         status: 'success',

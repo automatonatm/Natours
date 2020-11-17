@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+const appError = require('../utils/appError');
 
 const tourSchema = new mongoose.Schema({
     name: {
@@ -49,7 +50,6 @@ const tourSchema = new mongoose.Schema({
     priceDiscount:{
         type: Number,
         validate: {
-
             validator: function (val) {
                 //not work on update
                 return val < this.price
@@ -82,11 +82,35 @@ const tourSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+     startLocation: {
+        //GeoJSON
+         type: {
+             type: String,
+             default: 'Point',
+             enum: ['Point']
+         },
+         coordinates: [Number],
+         address: String,
+         description: String
+     },
+    locations: [
+        {
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point']
+            },
+            coordinates: [Number],
+            address: String,
+            description: String,
+            day: Number
+        }
+    ],
     startDates: [Date]
 },{
     toJSON: {virtuals: true},
     toObject: {virtuals: true},
-});
+}, { emitIndexErrors: true });
 
 tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7
@@ -116,6 +140,25 @@ tourSchema.pre('aggregate', function (next) {
 });
 
 
+
+
+
+/*
+tourSchema.post('save', function( error, res, next) {
+
+    if (error.name === 'MongoError' && error.code === 11000) {
+        console.log(error.MongoError)
+        next(new appError('There was a duplicate key error', 400));
+    } else {
+        next();
+    }
+});
+
+tourSchema.post('update', handleE11000);
+tourSchema.post('findOneAndUpdate', handleE11000);
+tourSchema.post('insertMany', handleE11000);
+
+*/
 
 
 /*

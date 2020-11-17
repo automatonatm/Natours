@@ -13,6 +13,7 @@ exports.getAllUser = (req, res) => {
 
 
 
+
 // @desc Get a user
 // @route GET /api/v1/users/:id
 // @access Private

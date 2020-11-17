@@ -1,6 +1,7 @@
 const appError = require('../utils/appError')
 
 const sendDevError =  (err, res) => {
+
     res.status(err.statusCode)
         .json({
             status: err.status,
@@ -8,14 +9,33 @@ const sendDevError =  (err, res) => {
             err: err,
             stack: err.stack
         });
-}
+
+   /* if(err.isOperational) {
+
+        res.status(err.statusCode)
+            .json({
+                status: err.status,
+                message: err.message,
+                err: err,
+                stack: err.stack
+            });
+    }else {
+        res.status(500).json({
+            status: "error",
+            message: "Something went very wrong!",
+        })
+    }*/
+};
 
 const sendProdError =  (err, res) => {
+
     if(err.isOperational) {
         res.status(err.statusCode)
             .json({
                 status: err.status,
                 message: err.message,
+
+
             });
     }else{
         res.status(500).json({
@@ -33,12 +53,18 @@ const  handleCastErrorDB = (err) => {
 const handleDuplicateFieldDB = (err) => {
 
     //Get the error object and iterate
-   const value = err.MongoError.match(/(["'])(\\?.)*?\1/)[0];
-    console.log(value)
-    const message = `x. Already exists`;
+   const value = err.message.match(/(["'])(\\?.)*?\1/)[0];
+    const message = `${value.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')} Already exists`;
     return new appError(message, 400 )
 };
 
+const handleValidationErrorDB = err => {
+    const errors = Object.values(err.errors).map(el => el.message);
+    const  message = `Invalid input data. ${errors.join('. ')}`;
+    return new appError(message, 400);
+}
+
+const handleAuthError = () =>  new appError('Access Denied, Please login and try again', 401);
 
 module.exports = (err, req, res, next) => {
 
@@ -47,17 +73,39 @@ module.exports = (err, req, res, next) => {
     err.status = err.status || 'error';
 
     if(process.env.NODE_ENV === 'development') {
-      sendDevError(err, res)
+
+       /* let error = { ...err };
+       //console.log(err.name)
+
+
+        if(err.name === 'CastError') error = handleCastErrorDB(error);
+
+        if(err.code === 11000) error = handleDuplicateFieldDB(err);
+
+        if(err.name === "ValidationError") error = handleValidationErrorDB(error);
+
+      sendDevError(error, res)
+*/
+
+        sendDevError(err, res)
+
 
     }else if(process.env.NODE_ENV === 'production') {
 
-        console.log(err)
-        let error = {...err};
+
+        let error = { ...err };
+
+
 
         if(err.name === 'CastError') error = handleCastErrorDB(error);
-        if(err.code === 11000) error = handleDuplicateFieldDB(error);
 
-      sendProdError(error, res)
+        if(err.code === 11000) error = handleDuplicateFieldDB(err);
+
+        if(err.name === "ValidationError") error = handleValidationErrorDB(error);
+
+        if(err.statusCode === 401) error = handleAuthError();
+
+       sendProdError(error, res)
     }
 
 

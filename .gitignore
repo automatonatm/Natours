@@ -91,5 +91,4 @@ typings/
 
 .gitignore
 .idea/
-package-lock.json
-package.json
+

@@ -113,8 +113,13 @@ exports.setResetPasswordToken = catchAsync(async (req, res, next) => {
 // @access Public
 exports.resetPassword = catchAsync(async (req, res, next) => {
 
+    if(req.body.password === '')  return next(new AppError('Please provide a new password', 422));
+
     //Get Hashed token
     const resetPasswordToken  = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
+
+
+
 
     //Find user by resettoken
     const user = await User.findOne({
@@ -123,12 +128,14 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     });
 
 
-    if (!user) return next(new AppError('Invalid Token', 400));
+
+    if (!user) return next(new AppError('Invalid or Expired Token', 400));
 
     user.password =  req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpiredAt = undefined;
-    user.save();
+    await user.save({validateBeforeSave: true});
+    //user.save();
 
     sendTokenResponse(user, 200, res)
 
@@ -148,10 +155,10 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     }
 
     user.password = req.body.password;
-    user.save();
+    await user.save({validateBeforeSave: true});
+    //user.save();
 
     sendTokenResponse(user, 200, res)
-
 });
 
 
@@ -207,8 +214,6 @@ exports.logOut = catchAsync(async (req, res, next) => {
             data: null
         })
 });
-
-
 
 
 

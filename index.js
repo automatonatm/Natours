@@ -18,6 +18,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRoute = require('./routes/tour');
 const userRoute = require('./routes/users');
 const authRoute = require('./routes/auth');
+const reviewRoute = require('./routes/review');
 
 const app = express();
 
@@ -74,6 +75,7 @@ app.use(express.static(`${__dirname}/public`));
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 //Handle 404 routes
 app.all('*', (req, res, next) => {

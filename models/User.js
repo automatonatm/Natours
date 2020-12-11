@@ -12,6 +12,17 @@ const crypto = require('crypto');
 
 
 const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true,  'Name field is required'],
+        maxlength: [50, 'Username cannot be more than 20 characters'],
+        minlength: [5, 'Username must have at least 5 characters'],
+        match: [
+            /^\b(?!.*\.{2})[a-zA-Z.]+(?:\s[a-zA-Z.]+)\b$/,
+            'The Full Name Format is Incorrect'
+        ]
+
+    },
     username: {
         type: String,
         unique: true,

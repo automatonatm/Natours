@@ -11,10 +11,10 @@ const crypto = require('crypto');
 
 exports.signup = catchAsync(async (req, res, next) => {
 
-    const {username, password, email } = req.body;
+    const {username, password, email, name } = req.body;
 
     const user = await User.create({
-        username, password, email
+        name, username, password, email
     });
 
     sendTokenResponse(user, 200, res);
@@ -184,6 +184,7 @@ exports.updateDetails = catchAsync(async (req, res, next) => {
 
     const fieldsToUpdate  =  {
             username: req.body.username,
+            name: req.body.name,
             email: req.body.email,
         }
     ;

@@ -11,6 +11,9 @@ const {
 } = require('../controllers/toursController');
 
 const {protect, authorize} = require('../middleware/auth');
+const advanceFilters = require('../utils/advanceFilters');
+const  Tour = require('./../models/Tour')
+
 
 //router.param('id', checkID)
 
@@ -26,7 +29,7 @@ router.route('/monthly-plan/:year')
 
 
 router.route('/')
-    .get(getAllTours)
+    .get(advanceFilters(Tour, ''),getAllTours)
     .post(protect, authorize('admin', 'lead-guide'), createTour);
 
 

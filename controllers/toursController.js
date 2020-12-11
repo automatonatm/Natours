@@ -1,7 +1,9 @@
 const Tour = require('../models/Tour');
 const ApiFeatures = require('../utils/apiFeatures');
+const advanceFilters = require('../utils/advanceFilters');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+
 
 
 
@@ -13,7 +15,6 @@ exports.createTour =  catchAsync(async (req, res, next) => {
 
 
     const tour = await Tour.create(req.body);
-
 
 
     res.status(201).json({
@@ -41,8 +42,7 @@ exports.aliasTopTours = (req, res, next) => {
 // @route GET /api/v1/tours
 // @access Public
 exports.getAllTours  =  catchAsync(async (req, res, next) => {
-
-        const features = new ApiFeatures(Tour.find(), req.query)
+/*        const features = new ApiFeatures(Tour.find(), req.query)
             .filter()
             .sort()
             .limitFields()
@@ -56,8 +56,9 @@ exports.getAllTours  =  catchAsync(async (req, res, next) => {
             data: {
                 tours
             }
-        })
-
+        })*/
+    res.status(200)
+        .json(res.advanceResults);
 
 });
 
@@ -66,8 +67,11 @@ exports.getAllTours  =  catchAsync(async (req, res, next) => {
 // @access Public
 exports.getTour  = catchAsync(async (req, res, next) => {
 
-
-        const tour = await Tour.findById(req.params.id);
+        const tour = await Tour.findById(req.params.id)
+           /* .populate({
+            path: 'guides',
+            select: '-__v -createdAt'
+        })*/;
 
         if(!tour) {
             return next(new AppError(`No tour with ID ${req.params.id} found`, 404))

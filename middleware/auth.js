@@ -35,9 +35,6 @@ exports.protect = catchAsync(async (req, res, next) => {
         if(!req.user)  return next(new  AppError('Access denied, please login', 401));
 
 
-
-
-
         next()
     } catch (err) {
         return next(new  AppError('Access denied, please login', 401))

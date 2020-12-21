@@ -74,6 +74,8 @@ const tourSchema = new mongoose.Schema({
             ref: 'User'
         }
     ],
+
+
     imageCover: {
         type: String,
         required: [true, 'A tour must have a cover Image']
@@ -114,26 +116,26 @@ const tourSchema = new mongoose.Schema({
         }
     ],
     startDates: [Date]
-},{
-    toJSON: {virtuals: true},
-    toObject: {virtuals: true},
-}, { emitIndexErrors: true });
+},
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    }
+);
+
+
 
 tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7
 });
 
+
+
+
 tourSchema.pre('save', function (next) {
     this.slug = slugify(this.name, {lower: true});
     next()
 });
-
-//Embedding
-/*tourSchema.pre('save', async function (next) {
-    const guidesPromises = this.guides.map(async id => await Users.findById(id))
-    this.guides = await Promise.all(guidesPromises)
-    next()
-})*/
 
 
 
@@ -162,35 +164,12 @@ tourSchema.pre('aggregate', function (next) {
 });
 
 
-
-
-
-
-
-/*
-tourSchema.post('save', function( error, res, next) {
-
-    if (error.name === 'MongoError' && error.code === 11000) {
-        console.log(error.MongoError)
-        next(new appError('There was a duplicate key error', 400));
-    } else {
-        next();
-    }
+tourSchema.virtual('reviews', {
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'tour',
+    justOne: false
 });
-
-tourSchema.post('update', handleE11000);
-tourSchema.post('findOneAndUpdate', handleE11000);
-tourSchema.post('insertMany', handleE11000);
-
-*/
-
-
-/*
-tourSchema.post(/^find/, function (docs, next) {
-   console.log(`Query took ${Date.now() - this.start} millisecs `);
-    next();
-});
-*/
 
 
 

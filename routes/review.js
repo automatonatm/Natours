@@ -1,9 +1,15 @@
 
 const express = require('express');
 
-const router = express.Router();
 
 
+const router = express.Router({
+          mergeParams: true // accepts merge params coming rerouted routes
+});
+
+const advanceFilters = require('../utils/advanceFilters');
+
+const  Review = require('./../models/Review')
 
 
 const {
@@ -12,10 +18,11 @@ const {
 
 const {protect, authorize} = require('../middleware/auth');
 
-router.route('/')
-    .get(getAllReviews)
-    .post(protect, authorize('admin', 'user'), createReview)
 
+// REVIEW NESTED ROUTE
+router.route('/')
+    .get(advanceFilters(Review,  ''), getAllReviews)
+    .post(protect, authorize('admin', 'user'), createReview )
 
 
 module.exports = router

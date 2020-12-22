@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const Tour = require('./../../models/Tour');
 const User = require('./../../models/User');
 const Review = require('./../../models/Review');
-//const User = require('./../../models/userModel');
 
 dotenv.config({ path: '../../.env' });
 

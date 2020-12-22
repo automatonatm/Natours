@@ -20,13 +20,17 @@ const advanceResults = (model, populate) => async(req,  res, next) => {
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
 
-    query = model.find(JSON.parse(queryStr));//.populate('courses');
+    query = model.find(JSON.parse(queryStr))//.populate('courses');
+    //query = model.find(JSON.parse(queryStr)).explain();//.populate('courses');
 
     //Selection fields
+
     if(req.query.select) {
         const fields = req.query.select.split(',').join(' ');
         query = query.select(fields)
     }
+
+
 
 
     // Sort
@@ -36,6 +40,16 @@ const advanceResults = (model, populate) => async(req,  res, next) => {
     }else  {
         query = query.sort('-createdAt');
     }
+
+    //if filter
+
+
+   /* let filter
+    if(req.params.tourId)  filter =  {tour: req.params.tourId}
+
+    const doc = await Model.find(filter)*/
+
+
 
     // Pagination
     const  page = parseInt(req.query.page, 10) || 1;

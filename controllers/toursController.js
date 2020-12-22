@@ -4,32 +4,54 @@ const advanceFilters = require('../utils/advanceFilters');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+const {deleteOne, updateOne, createOne, getOne, getAll} = require('./handlerFactory')
+
 
 
 
 // @desc Add a new tour
 // @route POST /api/v1/tours
 // @access Private
-
-exports.createTour =  catchAsync(async (req, res, next) => {
-
-
-    const tour = await Tour.create(req.body);
+exports.createTour = createOne(Tour)
 
 
-    res.status(201).json({
-        status: 'success',
-        data: {
-            tour
-        }
-    })
+// @desc Get a  tour
+// @route GET /api/v1/tours/:id
+// @access Public
+exports.getTour  = getOne(Tour, {path: 'reviews'})
 
-});
+
+
+// @desc Update a new tour
+// @route PUT /api/v1/tours/:id
+// @access Private
+exports.updateTour = updateOne(Tour)
+
+
+
+
+// @desc delete a  tour
+// @route DELETE /api/v1/tours/:id
+// @access Private
+// We use our Factory
+exports.deleteTour = deleteOne(Tour)
+
+
+
+
+// @desc Get all tours
+// @route GET /api/v1/tours
+// @access Public
+exports.getAllTours  = getAll(Tour)
+
+
+
+
+
 
 // @desc Get top 5 tours
 // @route GET /api/v1/tours
 // @access Public
-
 exports.aliasTopTours = (req, res, next) => {
     req.query.limit = '5';
     req.query.sort = '-ratingsAverage,price';
@@ -38,97 +60,6 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 
-// @desc Get all tours
-// @route GET /api/v1/tours
-// @access Public
-exports.getAllTours  =  catchAsync(async (req, res, next) => {
-/*        const features = new ApiFeatures(Tour.find(), req.query)
-            .filter()
-            .sort()
-            .limitFields()
-            .paginate();
-
-        const  tours = await features.query;
-
-        res.status(200).json({
-            status: 'success',
-            results: tours.length,
-            data: {
-                tours
-            }
-        })*/
-    res.status(200)
-        .json(res.advanceResults);
-
-});
-
-// @desc Get a  tour
-// @route GET /api/v1/tours/:id
-// @access Public
-exports.getTour  = catchAsync(async (req, res, next) => {
-
-        const tour = await Tour.findById(req.params.id).populate('reviews')
-           /* .populate({
-            path: 'guides',
-            select: '-__v -createdAt'
-        })*/;
-
-        if(!tour) {
-            return next(new AppError(`No tour with ID ${req.params.id} found`, 404))
-        }
-
-        res.status(200).json({
-            status: 'success',
-            data: {
-                tour
-            }
-        })
-
-});
-
-// @desc Update a new tour
-// @route PUT /api/v1/tours/:id
-// @access Private
-exports.updateTour = catchAsync(async (req, res, next) => {
-
-        const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        });
-    if(!tour) {
-        return next(new AppError(`No tour with ID ${req.params.id} found`, 404))
-    }
-
-
-    res.status(200).json({
-            status: true,
-            data: {
-                tour
-            }
-        })
-
-});
-
-
-// @desc delete a new tour
-// @route DELETE /api/v1/tours/:id
-// @access Private
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-
-     const tour  = await Tour.findByIdAndDelete(req.params.id);
-
-    if(!tour) {
-        return next(new AppError(`No tour with ID ${req.params.id} found`, 404))
-    }
-
-    res.status(204).json({
-            status: 'success',
-            data: null
-        })
-
-
-});
 
 // @desc  get Tours stats
 // @route GET /api/v1/tours/tour-stat

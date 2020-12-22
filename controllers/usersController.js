@@ -1,15 +1,12 @@
+const User = require('../models/User');
 
+const {deleteOne, updateOne, createOne, getOne, getAll} = require('./handlerFactory')
 
 // @desc Get all users
 // @route GET /api/v1/users/
 // @access Private
 
-exports.getAllUser = (req, res) => {
-    res.status(500).json({
-        status: false,
-        message: 'Route not yet Defined'
-    })
-};
+exports.getAllUser = getAll(User)
 
 
 
@@ -17,44 +14,28 @@ exports.getAllUser = (req, res) => {
 // @desc Get a user
 // @route GET /api/v1/users/:id
 // @access Private
-exports.getUser = (req, res) => {
-    res.status(500).json({
-        status: false,
-        message: 'Route not yet Defined'
-    })
-};
+exports.getUser = getOne(User)
 
 
 
 // @desc Add a user
 // @route POST /api/v1/users/
 // @access Private
-exports.createUser = (req, res) => {
-    res.status(500).json({
-        status: false,
-        message: 'Route not yet Defined'
-    })
-};
+exports.createUser = createOne(User)
+
+
+
+// @desc Update a single
+// @route PATCH /api/v1/users/
+// @access Private
+exports.updateUser = updateOne(User)
+
 
 
 // @desc Delete a user
 // @route DELETE /api/v1/users/:id
 // @access Private
-exports.deleteUser = (req, res) => {
-    res.status(500).json({
-        status: false,
-        message: 'Route not yet Defined'
-    })
-};
+exports.deleteUser = deleteOne(User)
 
 
-// @desc Update a single
-// @route PUT /api/v1/users/
-// @access Private
-exports.updateUser = (req, res) => {
 
-    res.status(500).json({
-        status: false,
-        message: 'Route not yet Defined'
-    })
-};

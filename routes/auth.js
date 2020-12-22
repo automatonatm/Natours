@@ -20,10 +20,13 @@ router.post('/signup', signup);
 router.post('/signin', limiter, signin);
 router.patch('/forgotpassword', setResetPasswordToken);
 router.patch('/resetpassword/:resettoken', resetPassword);
-router.patch('/updatepassword', protect, updatePassword);
-router.patch('/updateAccount', protect, updateDetails);
-router.get('/me', protect, getMe);
 router.post('/logout', logOut);
+
+router.use(protect); // keep for using protect
+router.patch('/updatepassword', updatePassword);
+router.patch('/updateAccount', updateDetails);
+router.get('/me', getMe);
+
 
 
 module.exports = router;

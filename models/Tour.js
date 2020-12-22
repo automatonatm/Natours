@@ -123,6 +123,10 @@ const tourSchema = new mongoose.Schema({
     }
 );
 
+tourSchema.index({price: 1, ratingsAverage: -1}) // -1 descending 1 ascending for query time
+
+tourSchema.index({slug: 1})
+
 
 
 tourSchema.virtual('durationWeeks').get(function () {

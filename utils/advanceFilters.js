@@ -16,20 +16,24 @@ const advanceResults = (model, populate) => async(req,  res, next) => {
     let queryStr = JSON.stringify(reqQuery);
 
 
+
+
     //creating  operators
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+
+
+    //console.log(queryStr)
 
 
     query = model.find(JSON.parse(queryStr))//.populate('courses');
     //query = model.find(JSON.parse(queryStr)).explain();//.populate('courses');
 
-    //Selection fields
 
+    //Selection fields
     if(req.query.select) {
         const fields = req.query.select.split(',').join(' ');
         query = query.select(fields)
     }
-
 
 
 
@@ -41,14 +45,13 @@ const advanceResults = (model, populate) => async(req,  res, next) => {
         query = query.sort('-createdAt');
     }
 
+
+
+
     //if filter
-
-
    /* let filter
     if(req.params.tourId)  filter =  {tour: req.params.tourId}
-
     const doc = await Model.find(filter)*/
-
 
 
     // Pagination
@@ -60,11 +63,12 @@ const advanceResults = (model, populate) => async(req,  res, next) => {
 
 
     query = query.skip(startIndex).limit(limit);
-
-
     if(populate) {
         query = query.populate(populate)
     }
+
+
+
 
     //Execute Query
     const  results = await query;
@@ -86,6 +90,7 @@ const advanceResults = (model, populate) => async(req,  res, next) => {
             limit
         }
     }
+
 
 
     res.advanceResults = {

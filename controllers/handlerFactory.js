@@ -5,7 +5,7 @@ const AppError = require('./../utils/appError')
 exports.createOne = Model =>  catchAsync(async (req, res, next) => {
 
 
-    console.log(getReqBody(req))
+
 
 
     const doc = await Model.create(getReqBody(req));
@@ -135,7 +135,7 @@ const getReqBody = (req) => {
     const reqBody = {...req.body};
 
     //Fields to exclude
-    const removeFields = ['role', 'ratingsAverage', 'priceDiscount', 'tour', 'durationWeeks', 'user'];
+    const removeFields = ['role', 'ratingsAverage', 'priceDiscount', 'durationWeeks'];
 
 
     //loop over removeFields and delete for request query

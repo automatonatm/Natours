@@ -46,6 +46,30 @@ reviewSchema.pre(/^find/, function (next) {
     next()
 })
 
+reviewSchema.statics.calculateAverageRatings = async function (tourId) {
+    const stats =   await this.aggregate([
+        {
+            $match: {tour: tourId}
+        },
+        {
+            $group: {
+                _id: '$tour',
+                nRating: {$sum: 1},
+                avgRating: {$avg: '$rating'}
+            }
+        }
+    ])
+    console.log(stats)
+}
+
+
+
+reviewSchema.pre('save', function (next) {
+    //point to current review
+    this.construct.calculateAverageRatings(this.tour)
+    next()
+})
+
 
 const Review = mongoose.model('Review', reviewSchema)
 

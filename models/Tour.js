@@ -75,7 +75,6 @@ const tourSchema = new mongoose.Schema({
         }
     ],
 
-
     imageCover: {
         type: String,
         required: [true, 'A tour must have a cover Image']
@@ -174,6 +173,8 @@ tourSchema.virtual('reviews', {
     foreignField: 'tour',
     justOne: false
 });
+
+
 
 
 

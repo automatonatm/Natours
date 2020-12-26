@@ -10,7 +10,10 @@ const reviewRouter =  require('./../routes/review')
 
 
 const {
-    getAllTours, createTour, getTour, updateTour, deleteTour, aliasTopTours, getTourStats, getMonthlyPlan
+    getAllTours, createTour,
+    getTour, updateTour,
+    deleteTour, aliasTopTours,
+    getTourStats, getMonthlyPlan, getToursWithin
 } = require('../controllers/toursController');
 
 
@@ -41,6 +44,9 @@ router.route('/tour-stats')
 
 router.route('/monthly-plan/:year')
     .get(getMonthlyPlan);
+
+router.route('/tours-within/:distance/center/:latlng/unit/:unit')
+    .get(getToursWithin)
 
 
 router.route('/')

@@ -35,6 +35,10 @@ const reviewSchema  = new mongoose.Schema({
     }, { emitIndexErrors: true }
     )
 
+
+//add a constraint that allows a user to add only one review per tour
+reviewSchema.index({tour: 1, user: 1}, {unique: true});
+
 reviewSchema.pre(/^find/, function (next) {
     this.populate({
         path: 'tour',
@@ -47,10 +51,67 @@ reviewSchema.pre(/^find/, function (next) {
     next()
 })
 
-reviewSchema.statics.calculateAverageRatings = async function (tourId) {
-    const stats =   await this.aggregate([
+
+
+/*
+
+reviewSchema.statics.calcAverageRatings = async function(tourId) {
+    const stats = await this.aggregate([
         {
-            $match: {tour: tourId}
+            $match: { tour: tourId }
+        },
+        {
+            $group: {
+                _id: '$tour',
+                nRating: { $sum: 1 },
+                avgRating: { $avg: '$rating' }
+            }
+        }
+    ]);
+     console.log(stats);
+
+    if (stats.length > 0) {
+        await Tour.findByIdAndUpdate(tourId, {
+            ratingsQuantity: stats[0].nRating,
+            ratingsAverage: stats[0].avgRating
+        });
+    } else {
+        await Tour.findByIdAndUpdate(tourId, {
+            ratingsQuantity: 0,
+            ratingsAverage: 4.5
+        });
+    }
+};
+
+reviewSchema.post('save', function() {
+    // this points to current review
+    this.constructor.calcAverageRatings(this.tour);
+});
+
+// findByIdAndUpdate
+// findByIdAndDelete
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+    this.r = await this.findOne();
+    next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function() {
+    // await this.findOne(); does NOT work here, query has already executed
+    await this.r.constructor.calcAverageRatings(this.r.tour);
+    //console.log(this.r.tour)
+});
+
+
+*/
+
+
+
+//static method to get average cost of course tuition
+reviewSchema.statics.getAverageRating  = async function (tourId) {
+
+    const obj = await  this.aggregate([
+        {
+            $match:  {tour: tourId}
         },
         {
             $group: {
@@ -59,25 +120,34 @@ reviewSchema.statics.calculateAverageRatings = async function (tourId) {
                 avgRating: {$avg: '$rating'}
             }
         }
-    ])
+
+    ]);
+
+    try {
+        await this.model('Tour').findByIdAndUpdate(tourId, {
+            ratingsQuantity: obj[0].nRating,
+            ratingsAverage: obj[0].avgRating
+            //Math.ceil(obj[0].averageCost / 10) * 10
+        })
+    } catch (err) {
+        console.error((err))
+    }
+};
 
 
 
-    await Tour.findByIdAndUpdate(tourId, {
-        ratingsQuantity: stats[0].nRating,
-        ratingsAverage: stats[0].avgRating
-    })
-
-}
-
-
-
+//call get Average cost after save
 reviewSchema.post('save', function () {
-    //point to current review
-    this.constructor.calculateAverageRatings(this.tour)
+    this.constructor.getAverageRating(this.tour)
+});
 
 
-})
+
+//call get Average cost before save
+reviewSchema.pre('remove', function () {
+    this.constructor.getAverageRating(this.tour)
+});
+
 
 
 const Review = mongoose.model('Review', reviewSchema)

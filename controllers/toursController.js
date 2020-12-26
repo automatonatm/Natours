@@ -61,6 +61,41 @@ exports.aliasTopTours = (req, res, next) => {
 
 
 
+// @desc Get tours with a certain redius
+// @route GET /api/v1/tours-within/:distance/center/:latlng/unit:unit
+// @access Public
+
+exports.getToursWithin = catchAsync(async (req, res, next) => {
+    const   {distance, latlng, unit }  = req.params
+
+
+    const [lat, lng] = latlng.split(',')
+
+    const radius =  unit === 'mi' ? (distance / 3963.2) : (distance / 6378.1)
+
+    if(!lat || !lng) {
+        return next(new AppError('Please Latitude and longitude in the format lat,lng', 400))
+
+    }
+
+    console.log(distance, lat, lng, unit)
+
+    const tours = await Tour.find({
+        startLocation: {$geoWithin: {$centerSphere: [[lng, lat], radius]} }
+    })
+
+    res.status(200).json({
+        status: 'success',
+        results: tours.length,
+        data: {
+            data: tours
+        }
+    })
+});
+
+
+
+
 // @desc  get Tours stats
 // @route GET /api/v1/tours/tour-stat
 // @access Public

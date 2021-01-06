@@ -1,7 +1,7 @@
 //Core Modules
 
 /*End*/
-
+const  path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const  cookieParser = require('cookie-parser');
@@ -19,8 +19,17 @@ const tourRoute = require('./routes/tour');
 const userRoute = require('./routes/users');
 const authRoute = require('./routes/auth');
 const reviewRoute = require('./routes/review');
+const viewRoute = require('./routes/viewRoutes');
 
 const app = express();
+
+
+//App views
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+//Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 //Set security Htpp header
 app.use(helmet());
@@ -66,13 +75,13 @@ app.use(hpp({
     whitelist: ['duration']
 }));
 
-app.use(express.static(`${__dirname}/public`));
+//app.use(express.static(`${__dirname}/public`));
+
 /*End*/
 
 
-
-
-//Mount Routers
+//Mount  View Routers
+app.use('/', viewRoute);
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/auth', authRoute);

@@ -4,27 +4,27 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 
-const {deleteOne, updateOne, createOne, getOne, getAll} = require('./handlerFactory')
+const {deleteOne, updateOne, createOne, getOne, getAll} = require('./handlerFactory');
 
 
 
 // @desc Create a Review
 // @route POST /api/v1/tours/:tourId/reviews
 // @access Private
-exports.createReview = createOne(Review)
+exports.createReview = createOne(Review);
 
 
 // @desc get a  single Review
 // @route GET /api/v1/reviews/:id
 // @access Public
-exports.getAReview = getOne(Review)
+exports.getAReview = getOne(Review);
 
 
 // @desc update a  single Review
 // @route PUT /api/v1/reviews/:id
 // @access Private
 // We use our Factory
-exports.updateReview = updateOne(Review)
+exports.updateReview = updateOne(Review);
 
 
 
@@ -33,7 +33,7 @@ exports.updateReview = updateOne(Review)
 // @route DELETE /api/v1/reviews/:id
 // @access Private
 // We use our Factory
-exports.deleteReview = deleteOne(Review)
+exports.deleteReview = deleteOne(Review);
 
 
 
@@ -41,7 +41,7 @@ exports.deleteReview = deleteOne(Review)
 // @route GET /api/v1/reviews
 // @access Public
 
-exports.getAllReviews = getAll(Review)
+exports.getAllReviews = getAll(Review);
 
 
 
@@ -50,10 +50,10 @@ exports.getAllReviews = getAll(Review)
 //middleware for creating a review
 
 exports.setTourUserId = (req, res, next) => {
-    if(!req.body.tour)  req.body.tour = req.params.tourId
-    if(!req.body.user)  req.body.user = req.user.id
+    if(!req.body.tour)  req.body.tour = req.params.tourId;
+    if(!req.body.user)  req.body.user = req.user.id;
     next()
-}
+};
 
 
 

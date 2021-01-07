@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema({
     passwordChangedAt: Date,
     photo: {
         type: String,
-        default: 'default.png'
+        default: 'default.jpg'
     },
     active: {
         type: Boolean,

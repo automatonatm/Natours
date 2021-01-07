@@ -18,19 +18,12 @@ exports.protect = catchAsync(async (req, res, next) => {
         token = req.cookies.token;
     }
 
-    //Make sure token exist where by cookie or authorization
-    /* if(!token) {
-         return next(new  ErrorResponse('Access denied', 401))
-     }*/
-
-
-    //verify token
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = await User.findById(decoded.id);
 
-        const user = await User.findById(decoded.id);
+       // const user = await User.findById(decoded.id);
 
         if(!req.user)  return next(new  AppError('Access denied, please login', 401));
 
@@ -39,6 +32,25 @@ exports.protect = catchAsync(async (req, res, next) => {
     } catch (err) {
         return next(new  AppError('Access denied, please login', 401))
     }
+
+});
+
+
+// only For rendered pages and it shall oontain no error
+exports.isLogin = catchAsync(async (req, res, next) => {
+
+    let token;
+    if(req.cookies.token) {
+        //set token from logout
+        token = req.cookies.token;
+        const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+       const user = await User.findById(decoded.id);
+        if(!user)  return next();
+        res.locals.user = user;
+    }
+    //There is a logged in user
+
+    next()
 
 });
 

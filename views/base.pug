@@ -2,8 +2,9 @@ doctype html
 html
     head
         block head
+            //meta(http-equiv='Content-Security-Policy' content="default-src *; style-src 'self'  'unsafe-inline'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js 'unsafe-inline' https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js 'script-src-elem' https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js  'unsafe-eval'")
             meta(charset='UTF-8')
-            meta(http-equiv='Content-Security-Policy' content="default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'")
+
             meta(name='viewport' content='width=device-width, initial-scale=1.0')
             link(rel='stylesheet' href='/css/style.css')
             link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
@@ -19,6 +20,11 @@ html
 
         //footer
         include  _footer
+        script(src="/js/axios.js")
+        script(src="/js/index.js", type="module")
+
+
+
 
 
 

@@ -1,6 +1,9 @@
 const express = require('express');
+
 const router = express.Router();
 const rateLimit = require("express-rate-limit");
+
+
 
 const limiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 15 minutes
@@ -13,7 +16,9 @@ const limiter = rateLimit({
 
 
 const {protect} = require('../middleware/auth');
-const {signup, signin, logOut, setResetPasswordToken, resetPassword, updatePassword, getMe, updateDetails} = require('../controllers/authController');
+const {signup, signin, logOut, setResetPasswordToken,
+    resetPassword, updatePassword, getMe,
+    updateDetails, uploadUserPhoto, resizePhoto} = require('../controllers/authController');
 
 
 router.post('/signup', signup);
@@ -24,7 +29,7 @@ router.post('/logout', logOut);
 
 router.use(protect); // keep for using protect
 router.patch('/updatepassword', updatePassword);
-router.patch('/updateAccount', updateDetails);
+router.patch('/updateAccount', uploadUserPhoto, resizePhoto,  updateDetails);
 router.get('/me', getMe);
 
 

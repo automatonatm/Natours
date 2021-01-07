@@ -4,12 +4,13 @@
 const  path = require('path');
 const express = require('express');
 const morgan = require('morgan');
-const  cookieParser = require('cookie-parser');
+const  cookieParser = require('cookie-parser'); //Allows cookies to be passed on each request
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 
 
 //Routes
@@ -23,6 +24,13 @@ const viewRoute = require('./routes/viewRoutes');
 
 const app = express();
 
+/*app.use(function (req, res, next) {
+    res.setHeader(
+        'Content-Security-Policy-Report-Only',
+        "default-src 'self'; font-src 'self'; img-src 'self'; script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js 'sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ==' 'unsafe-inline';  style-src 'self'; frame-src 'self'"
+    );
+    next();
+})*/
 
 //App views
 app.set('view engine', 'pug');
@@ -58,7 +66,7 @@ app.use('/api',limiter);*/
 app.use(express.json({limit: '10kb'}));
 
 
-//Cookie Passer
+//Cookie Passer allows data to be passed as cookies
 app.use(cookieParser());
 
 
@@ -78,6 +86,17 @@ app.use(hpp({
 //app.use(express.static(`${__dirname}/public`));
 
 /*End*/
+
+
+//http cors
+app.use(cors());
+
+//Test Middleware
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString();
+    //console.log(req.cookies)
+    next()
+})
 
 
 //Mount  View Routers

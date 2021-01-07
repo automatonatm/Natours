@@ -3,6 +3,60 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const sendMail = require('../utils/sendEmail');
 const crypto = require('crypto');
+const  multer = require('multer');
+const sharp = require('sharp');
+
+
+/*const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/img/users',  )
+    },
+    filename:  (req, file, cb) => {
+        const ext = file.mimetype.split('/')[1];
+        cb(null, `user-${req.user.id}-${Date.now()}.${ext}`)
+    }
+});*/
+
+//store image in memory
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+    if(file.mimetype.startsWith('image')) {
+        cb(null, true)
+    }else {
+        cb(new AppError('Not an image!', 400), false)
+    }
+
+};
+//specify the storage file
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter
+});
+
+//upload to temporary file
+exports.uploadUserPhoto = upload.single('photo');
+
+//Image Processing
+exports.resizePhoto = (req, res, next) => {
+    if(!req.file) return  next();
+
+     req.file.filename =  `user-${req.user.id}-${Date.now()}.jpeg`;
+
+    sharp(req.file.buffer)
+        .resize({
+            width: 500,
+            height: 500,
+            fit: sharp.fit.cover,
+
+        })
+        .toFormat('jpeg')
+        .jpeg({quality : 90})
+        .toFile(`public/img/users/${req.file.filename}`);
+
+    next();
+}
+
 
 
 // @desc Register as a new user
@@ -31,7 +85,7 @@ exports.signin = catchAsync(async (req, res, next) => {
 
     const {email, password} = req.body;
 
-    console.log(req.body)
+    //console.log(req.cookies)
 
     //validate
     if(!password || !email) return  next(new AppError('Please fill all form fields', 400 ));
@@ -181,13 +235,16 @@ exports.getMe = catchAsync(async (req, res, next) => {
 // @route POST /api/v1/auth/updatedetails
 // @access Private
 exports.updateDetails = catchAsync(async (req, res, next) => {
+    console.log(req.file);
+    console.log(req.body);
 
     const fieldsToUpdate  =  {
             username: req.body.username,
             name: req.body.name,
             email: req.body.email,
-        }
-    ;
+        };
+    if(req.file) fieldsToUpdate.photo = req.file.filename;
+
 
     const user = await User.findByIdAndUpdate(req.user.id , fieldsToUpdate, {new: true, runValidators: true});
 
@@ -222,12 +279,11 @@ exports.logOut = catchAsync(async (req, res, next) => {
 const sendTokenResponse = (user, statusCode, res) => {
     //create Token
     const token = user.getSignedJwtToken();
-
     const options = {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 *   60 * 60 * 1000 ),
     };
 
-    if(process.env.NODE_ENV === 'production') options.httpOnly = true; options.secure = true ;
+    if(process.env.NODE_ENV === 'production') options.httpOnly = true; //options.secure = true ;
 
     res.status(statusCode)
         .cookie('token', token, options)

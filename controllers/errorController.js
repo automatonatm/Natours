@@ -64,7 +64,9 @@ const handleValidationErrorDB = err => {
     return new appError(message, 400);
 }
 
-const handleAuthError = () =>  new appError('Access Denied, Please login and try again', 401);
+const handleAuthError = (err) =>  new appError(err.message, 401);
+
+const handleBadRequest = (err) =>  new appError(err.message, 400);
 
 module.exports = (err, req, res, next) => {
 
@@ -103,7 +105,9 @@ module.exports = (err, req, res, next) => {
 
         if(err.name === "ValidationError") error = handleValidationErrorDB(error);
 
-        if(err.statusCode === 401) error = handleAuthError();
+        if(err.statusCode === 401) error = handleAuthError(err);
+
+       if(err.statusCode === 400) error = handleBadRequest(err);
 
        sendProdError(error, res)
     }

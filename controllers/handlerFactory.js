@@ -50,6 +50,8 @@ exports.getOne = (Model, populateOptions = null) => catchAsync(async (req, res, 
 exports.updateOne = Model => catchAsync(async (req, res, next) => {
 
 
+
+
     const doc = await Model.findByIdAndUpdate(req.params.id, getReqBody(req), {
         new: true,
         runValidators: true

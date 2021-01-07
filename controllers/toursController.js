@@ -3,10 +3,82 @@ const ApiFeatures = require('../utils/apiFeatures');
 const advanceFilters = require('../utils/advanceFilters');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const  multer = require('multer');
+const sharp = require('sharp');
 
 const {deleteOne, updateOne, createOne, getOne, getAll} = require('./handlerFactory')
 
+//store image in memory
+const multerStorage = multer.memoryStorage();
 
+const multerFilter = (req, file, cb) => {
+    if(file.mimetype.startsWith('image')) {
+        cb(null, true)
+    }else {
+        cb(new AppError('Not an image!', 400), false)
+    }
+
+};
+//specify the storage file
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter
+});
+
+//upload multiple images(mixed)
+exports.uploadTourImage = upload.fields([
+    {name: 'imageCover', maxCount: 1},
+    {name: 'images', maxCount: 3}
+]);
+
+//Just for multiple with same name
+//upload.array('images', 4)
+
+
+//Image Processing
+exports.resizeTourImages = catchAsync( async (req, res, next) => {
+
+    if(!req.files.imageCover || !req.files.images) return  next();
+
+    //console.log(req.files);
+    // 1) Cover image
+    const imageCoverFileName = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+    await sharp(req.files.imageCover[0].buffer)
+        .resize({
+            width: 2000,
+            height: 1333,
+            fit: sharp.fit.cover,
+        })
+        .toFormat('jpeg')
+        .jpeg({quality : 90})
+        .toFile(`public/img/tours/${imageCoverFileName}`);
+
+    //Add it to request body since we are using a factory
+     req.body.imageCover = imageCoverFileName;
+
+
+    //2) images
+    req.body.images = []; // create empty list images
+    await Promise.all(req.files.images.map( async (file, index) => {
+        const filename = `tour-${req.params.id}-${Date.now()}-${index + 1}.jpeg`;
+        await sharp(file.buffer)
+            .resize({
+                width: 1500,
+                height: 888,
+                fit: sharp.fit.cover,
+            })
+            .toFormat('jpeg')
+            .jpeg({quality : 45})
+            .toFile(`public/img/tours/${filename}`);
+
+        // At each loop push the file name
+        req.body.images.push(filename)
+    }));
+
+    console.log(req.body)
+
+    next()
+});
 
 
 // @desc Add a new tour
@@ -78,7 +150,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
 
     }
 
-    console.log(distance, lat, lng, unit)
+
 
     const tours = await Tour.find({
         startLocation: {$geoWithin: {$centerSphere: [[lng, lat], radius]} }
@@ -187,6 +259,20 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 
 });
 
+
+exports.filterFields  = (req, res, next) =>  {
+    //copy of request query
+    const reqBody = {...req.body};
+
+    //Fields to exclude
+    const removeFields = ['role', 'ratingsAverage', 'priceDiscount', 'durationWeeks'];
+
+
+    //loop over removeFields and delete for request query
+     req.body = removeFields.forEach(param => delete reqBody[param]);
+     next()
+
+};
 
 
 

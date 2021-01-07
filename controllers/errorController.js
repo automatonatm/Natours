@@ -68,6 +68,8 @@ const handleAuthError = (err) =>  new appError(err.message, 401);
 
 const handleBadRequest = (err) =>  new appError(err.message, 400);
 
+const handleForbidden = (err) =>  new appError(err.message, 403);
+
 module.exports = (err, req, res, next) => {
 
 
@@ -108,6 +110,8 @@ module.exports = (err, req, res, next) => {
         if(err.statusCode === 401) error = handleAuthError(err);
 
        if(err.statusCode === 400) error = handleBadRequest(err);
+
+       if(err.statusCode === 403) error = handleForbidden(err);
 
        sendProdError(error, res)
     }

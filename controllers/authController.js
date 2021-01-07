@@ -38,12 +38,12 @@ const upload = multer({
 exports.uploadUserPhoto = upload.single('photo');
 
 //Image Processing
-exports.resizePhoto = (req, res, next) => {
+exports.resizePhoto =  catchAsync(async (req, res, next) => {
     if(!req.file) return  next();
 
-     req.file.filename =  `user-${req.user.id}-${Date.now()}.jpeg`;
+    req.file.filename =  `user-${req.user.id}-${Date.now()}.jpeg`;
 
-    sharp(req.file.buffer)
+    await sharp(req.file.buffer)
         .resize({
             width: 500,
             height: 500,
@@ -55,7 +55,7 @@ exports.resizePhoto = (req, res, next) => {
         .toFile(`public/img/users/${req.file.filename}`);
 
     next();
-}
+});
 
 
 
@@ -235,8 +235,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
 // @route POST /api/v1/auth/updatedetails
 // @access Private
 exports.updateDetails = catchAsync(async (req, res, next) => {
-    console.log(req.file);
-    console.log(req.body);
+
 
     const fieldsToUpdate  =  {
             username: req.body.username,

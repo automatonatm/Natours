@@ -11,6 +11,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
+const  compression = require('compression');
 
 
 //Routes
@@ -24,6 +25,8 @@ const viewRoute = require('./routes/viewRoutes');
 
 const app = express();
 
+app.enable('trust proxy');
+
 /*app.use(function (req, res, next) {
     res.setHeader(
         'Content-Security-Policy-Report-Only',
@@ -33,8 +36,19 @@ const app = express();
 })*/
 
 //App views
+//http cors
+
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
+
+
+/*app.use(cors({
+    origin: 'https://.natours.com'
+}));*/
+app.use(cors());
+
+app.options('*', cors());
 
 //Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -88,9 +102,8 @@ app.use(hpp({
 /*End*/
 
 
-//http cors
-app.use(cors());
 
+app.use(compression());
 //Test Middleware
 app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();

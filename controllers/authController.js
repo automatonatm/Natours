@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-const sendMail = require('../utils/sendEmail');
+const Email = require('../utils/sendEmail');
 const crypto = require('crypto');
 const  multer = require('multer');
 const sharp = require('sharp');
@@ -71,7 +71,10 @@ exports.signup = catchAsync(async (req, res, next) => {
         name, username, password, email
     });
 
-    sendTokenResponse(user, 200, res);
+    const url = `${req.protocol}://${req.get('host')}/`;
+    await new Email(user, url).sendWelcome();
+
+    sendTokenResponse(user, 201, res, req);
 
 
 });
@@ -132,15 +135,10 @@ exports.setResetPasswordToken = catchAsync(async (req, res, next) => {
 
     const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
 
-    const message = `Click here to reset your password ${resetUrl}`;
+    //const message = `Click here to reset your password ${resetUrl}`;
 
     try {
-        await sendMail({
-            email:  user.email,
-            subject: 'Password Reset Token',
-            message
-        })
-
+        await new Email(user, resetUrl).sendPasswordReset();
         return res.status(200)
             .json({
                 status: 'success',
@@ -275,14 +273,17 @@ exports.logOut = catchAsync(async (req, res, next) => {
 
 
 //Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
+const sendTokenResponse = (user, statusCode, res, req) => {
     //create Token
     const token = user.getSignedJwtToken();
     const options = {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 *   60 * 60 * 1000 ),
     };
 
-    if(process.env.NODE_ENV === 'production') options.httpOnly = true; //options.secure = true ;
+   // if(process.env.NODE_ENV === 'production') options.httpOnly = true; options.secure = true ;
+
+    //Heroku
+    if(req.secure || req.headers('x-forwarded-proto') === 'https' ) options.httpOnly = true; options.secure = true ;
 
     res.status(statusCode)
         .cookie('token', token, options)
